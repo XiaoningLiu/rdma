@@ -2,7 +2,7 @@
 #include "SocketException.h"
 #include <string>
 
-int main ( int argc, int argv[] )
+int main ( int argc, char** argv )
 {
   std::cout << "running....\n";
 
