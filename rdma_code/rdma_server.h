@@ -6,13 +6,18 @@
 #ifndef RDMASERVER_H
 #define RDMASERVER_H
 
+#include "SocketException.h"
+#include "ServerSocket.h"
+#include "rdma_server.h"
+#include "rdma_common.h"
+
 class RDMAServer
 {	
 public:
     RDMAServer();
     ~RDMAServer();
     bool bind(int port);
-    bool creatChannel(); // wait until receive "CONNECT_REQUEST"
+    bool createChannel(); // wait until receive "CONNECT_REQUEST"
     bool registerMemory(uchar* p, int size);
     bool acceptConnection(); // receive CONNECT_REQUEST, send ACK, receive CONNECT_ESTABLISHED, send ACK
     bool dealEvent(); // judge evenet types & deal different msg

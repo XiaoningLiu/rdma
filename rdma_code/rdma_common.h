@@ -22,7 +22,7 @@ const std::string EVENT_WRITE = "EVENT_WRITE";
 const std::string EVENT_WRITE_ACK = "EVENT_WRITE_ACK";
 const std::string EVENT_WRITE_FAIL_ACK = "EVENT_WRITE_FAIL_ACK";
 
-uint uchar2int(uchar c)
+uint uchar2uint(uchar c)
 {
    return uint(c); 
 }
@@ -37,7 +37,7 @@ std::string uchar2str(uchar c)
     std::stringstream ss;
     std::string str;
 
-    ss << uchar2int(c);
+    ss << uchar2uint(c);
     ss >> str;
 
     return str;
@@ -51,6 +51,27 @@ uchar str2uchar(std::string str)
     ss >> i;
 
     return uint2uchar(i);
+}
+
+int str2int(std::string str)
+{
+    std::stringstream ss(str);
+
+    int i;
+    ss >> i;
+
+    return i;
+}
+
+std::string int2str(int i)
+{
+    std::stringstream ss;
+    std::string str;
+
+    ss << i;
+    ss >> str;
+
+    return str;
 }
 
 #endif//RDMA_COMMON_H

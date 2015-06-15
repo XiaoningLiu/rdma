@@ -1,8 +1,6 @@
 /* filename: rdma_server.cpp */
 
 #include <iostream>
-#include <rdma_server.h>
-#include <rdma_common.h>
 
 using namespace::std;
 
@@ -34,14 +32,14 @@ bool RDMAServer::bind(int port)
     }
     catch ( SocketException& e )
     {
-        std::cerr<< "Exception was caught:" << e.description() << "\nExiting.\n";
+        std::cerr<< "Cannot bind, Exception was caught:" << e.description() << "\nExiting.\n";
         return false;
     }
 
     return true;
 }
 
-bool RDMAServer::creatChannel()
+bool RDMAServer::createChannel()
 {
     if (channel != 0)
     {
@@ -56,8 +54,34 @@ bool RDMAServer::creatChannel()
     }
     catch ( SocketException& e )
     {
-        std::cerr<< "Exception was caught:" << e.description() << "\nExiting.\n";
+        std::cerr<< "Cannot create channel, Exception was caught:" << e.description() << "\nExiting.\n";
         return false;
+    }
+
+    return true;
+}
+
+bool RDMAServer::registerMemory(uchar *p, int s)
+{
+    memory = p;
+    size = s;
+}
+
+bool RDMAServer::acceptConnection()
+{
+    string msg;
+    *channel >> msg;
+    if (msg == CONNECT_REQUEST)
+    {
+        cout<<"RDMAServer::acceptConnection(), receive CONNECT_REQUEST"<<endl;
+        *channel << CONNECT_REQUEST_ACK;
+    }
+
+    *channel >> msg;
+    if (msg == CONNECT_ESTABLISHED)
+    {
+        cout<<"RDMAServer::acceptConnection(), receive CONNECT_ESTABLISHED"<<endl;
+        *channel << CONNECT_ESTABLISHED_ACK;
     }
 
     return true;
@@ -68,18 +92,24 @@ bool RDMAServer::dealEvent()
     std::string msg;
     *channel >> msg;
 
+    string offset_str;
+    string memSize_str;
+
     int offset;
     int memSize;
 
     if (msg == EVENT_READ)
     {
-        *channel >> offset;
-        *channel >> memSize;
+        cout<<"RDMAServer::dealEvent(), got EVENT_READ"<<endl;
+        *channel >> offset_str;
+        *channel >> memSize_str;
+        offset = str2int(offset_str);
+        size   = str2int(memSize_str);
 
         if (offset + memSize > size)
         {
-            cerr<<"Request size too large"<<endl;
-            *channel << EVENT_READ_FAIL_ACK;
+            cerr<<"RDMAServer::dealEvent(), Request size too large"<<endl;
+            *channel << EVENT_READ_FAIL_ACK + " ";
             return false;
         }
 
@@ -88,21 +118,25 @@ bool RDMAServer::dealEvent()
         // transfer all memory data via char?
         for (int i = 0; i < size; i++)
         {
-            *channel << uchar2str( *mem );
+            *channel << uchar2str( *mem ) + " ";
             mem++;
         }
 
-        *channel << EVENT_READ_ACK;
+        *channel << EVENT_READ_ACK + " ";
+        return true;
     }
     else if (msg == EVENT_WRITE)
     {
-        *channel >> offset;
-        *channel >> memSize;
+        cout<<"RDMAServer::dealEvent(), got EVENT_WRITE"<<endl;
+        *channel >> offset_str;
+        *channel >> memSize_str;
+        offset = str2int(offset_str);
+        size   = str2int(memSize_str);
 
         if (offset + memSize > size)
         {
-            cerr<<"Request write size too large"<<endl;
-            *channel << EVENT_WRITE_FAIL_ACK;
+            cerr<<"RDMAServer::dealEvent(), Request size too large"<<endl;
+            *channel << EVENT_WRITE_FAIL_ACK + " ";
             return false;
         }
 
@@ -117,18 +151,23 @@ bool RDMAServer::dealEvent()
             mem++;
         }
 
-        *channel << EVENT_WRITE_ACK;
+        *channel << EVENT_WRITE_ACK + " ";
+        return true;
     }
     else if (msg == DISCONNECT)
     {
-        //close socket
-
-        *channel << DISCONNECT_ACK;
-        return true;
+        cout<<"RDMAServer::dealEvent(), got DISCONNECT"<<endl;
+        return disconnect();
     }
     else
     {
         cerr<<"Unkonw msg: "<<msg<<endl;
         return true;
     }
+}
+
+bool RDMAServer::disconnect()
+{
+    *channel << DISCONNECT_ACK + " ";
+    return true;
 }
