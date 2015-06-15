@@ -8,7 +8,6 @@
 
 #include "SocketException.h"
 #include "ServerSocket.h"
-#include "rdma_server.h"
 #include "rdma_common.h"
 
 class RDMAServer

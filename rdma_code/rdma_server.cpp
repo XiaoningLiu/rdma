@@ -1,6 +1,7 @@
 /* filename: rdma_server.cpp */
 
 #include <iostream>
+#include "rdma_server.h"
 
 using namespace::std;
 
@@ -71,10 +72,16 @@ bool RDMAServer::acceptConnection()
 {
     string msg;
     *channel >> msg;
+
     if (msg == CONNECT_REQUEST)
     {
         cout<<"RDMAServer::acceptConnection(), receive CONNECT_REQUEST"<<endl;
         *channel << CONNECT_REQUEST_ACK;
+    }
+    else
+    {
+        cerr<<"RDMAServer::acceptConnection(), receive unkonwn msg: "<<msg<<endl;
+        return false;
     }
 
     *channel >> msg;
@@ -82,6 +89,11 @@ bool RDMAServer::acceptConnection()
     {
         cout<<"RDMAServer::acceptConnection(), receive CONNECT_ESTABLISHED"<<endl;
         *channel << CONNECT_ESTABLISHED_ACK;
+    }
+    else
+    {
+        cerr<<"RDMAServer::acceptConnection(), receive unkonwn msg: "<<msg<<endl;
+        return false;
     }
 
     return true;
@@ -109,8 +121,12 @@ bool RDMAServer::dealEvent()
         if (offset + memSize > size)
         {
             cerr<<"RDMAServer::dealEvent(), Request size too large"<<endl;
-            *channel << EVENT_READ_FAIL_ACK + " ";
+            *channel << EVENT_READ_FAIL_ACK ;
             return false;
+        }
+        else
+        {
+            *channel << EVENT_READ_START ;
         }
 
         uchar* mem = memory + offset;
@@ -118,11 +134,11 @@ bool RDMAServer::dealEvent()
         // transfer all memory data via char?
         for (int i = 0; i < size; i++)
         {
-            *channel << uchar2str( *mem ) + " ";
+            *channel << uchar2str( *mem ) ;
             mem++;
         }
 
-        *channel << EVENT_READ_ACK + " ";
+        *channel << EVENT_READ_ACK ;
         return true;
     }
     else if (msg == EVENT_WRITE)
@@ -136,8 +152,12 @@ bool RDMAServer::dealEvent()
         if (offset + memSize > size)
         {
             cerr<<"RDMAServer::dealEvent(), Request size too large"<<endl;
-            *channel << EVENT_WRITE_FAIL_ACK + " ";
+            *channel << EVENT_WRITE_FAIL_ACK ;
             return false;
+        }
+        else
+        {
+            *channel << EVENT_WRITE_START ;
         }
 
         // Got memory data & save to memory
@@ -151,23 +171,24 @@ bool RDMAServer::dealEvent()
             mem++;
         }
 
-        *channel << EVENT_WRITE_ACK + " ";
+        *channel << EVENT_WRITE_ACK ;
         return true;
     }
     else if (msg == DISCONNECT)
     {
         cout<<"RDMAServer::dealEvent(), got DISCONNECT"<<endl;
-        return disconnect();
+        disconnect();
+        return false;
     }
     else
     {
         cerr<<"Unkonw msg: "<<msg<<endl;
-        return true;
+        return false;
     }
 }
 
 bool RDMAServer::disconnect()
 {
-    *channel << DISCONNECT_ACK + " ";
+    *channel << DISCONNECT_ACK ;
     return true;
 }

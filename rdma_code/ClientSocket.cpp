@@ -11,10 +11,17 @@ ClientSocket::ClientSocket ( std::string host, int port )
       throw SocketException ( "Could not create client socket." );
     }
 
-  if ( ! Socket::connect ( host, port ) )
-    {
-      throw SocketException ( "Could not bind to port." );
-    }
+  for (int i = 0; i < 5; i++)
+  {
+      if (Socket::connect ( host, port ) == true)
+         return;
+
+      for (int j = 0; j < 1000 * 1000; j++)
+      {
+          continue;
+      }
+  }
+  throw SocketException ( "Could not bind to port." );
 
 }
 
