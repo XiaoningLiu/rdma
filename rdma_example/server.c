@@ -44,10 +44,15 @@ static int on_event(struct rdma_cm_event *event);
 
 static struct context *s_ctx = NULL;
 
+/* Questions 
+1. What's the difference between event channel & event id?
+2. What's
+*/
+
 int main(int argc, char **argv)
 {
   struct sockaddr_in6 addr;             // Socket server address?
-  struct rdma_cm_event *event = NULL;   // RDMA event 
+  struct rdma_cm_event *event = NULL;   // RDMA event, There are 3 basic events: connect request, connected, disconnected
   struct rdma_cm_id *listener = NULL;   // RDMA id
   struct rdma_event_channel *ec = NULL; // RDMA event channel
   uint16_t port = 0;                    // Socket server port?
@@ -152,12 +157,12 @@ void post_receives(struct connection *conn)
   sge.length = BUFFER_SIZE;
   sge.lkey = conn->recv_mr->lkey;
 
-  TEST_NZ(ibv_post_recv(conn->qp, &wr, &bad_wr));
+  TEST_NZ(ibv_post_recv(conn->qp, &wr, &bad_wr)); // ibv key point
 }
 
 void register_memory(struct connection *conn)
 {
-  conn->send_region = malloc(BUFFER_SIZE);
+  conn->send_region = malloc(BUFFER_SIZE); // malloc BUFFER_SIZE memory space
   conn->recv_region = malloc(BUFFER_SIZE);
 
   TEST_Z(conn->send_mr = ibv_reg_mr(
@@ -268,9 +273,9 @@ int on_event(struct rdma_cm_event *event)
 {
   int r = 0;
 
-  if (event->event == RDMA_CM_EVENT_CONNECT_REQUEST) // Client got RDMA connect request? why client reciving request
+  if (event->event == RDMA_CM_EVENT_CONNECT_REQUEST) // Client got RDMA connect request? why client reciving request, ---> according to csdi project pdf, client send this event
     r = on_connect_request(event->id);
-  else if (event->event == RDMA_CM_EVENT_ESTABLISHED) // Client got RDMA connect established
+  else if (event->event == RDMA_CM_EVENT_ESTABLISHED) // Client got RDMA connect established, ---> client receive this event
     r = on_connection(event->id->context);
   else if (event->event == RDMA_CM_EVENT_DISCONNECTED) // Client got RDMA connect disconnected
     r = on_disconnect(event->id);
