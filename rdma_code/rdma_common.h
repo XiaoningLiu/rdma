@@ -13,6 +13,7 @@ const std::string CONNECT_REQUEST = "CONNECT_REQUEST";
 const std::string CONNECT_REQUEST_ACK = "CONNECT_REQUEST_ACK";
 const std::string CONNECT_ESTABLISHED = "CONNECT_ESTABLISHED";
 const std::string CONNECT_ESTABLISHED_ACK = "CONNECT_ESTABLISHED_ACK";
+const std::string ACK = "ACK";
 const std::string DISCONNECT = "DISCONNECT";
 const std::string DISCONNECT_ACK = "DISCONNECT_ACK";
 const std::string EVENT_READ  = "EVENT_READ";

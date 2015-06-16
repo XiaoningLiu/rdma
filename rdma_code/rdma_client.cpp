@@ -52,6 +52,7 @@ bool RDMAClient::connect()
        return false;
    }
 
+   *channel >> msg;
    if (msg == CONNECT_ESTABLISHED_ACK)
    {
        cout<<"RDMAClient::connect(), receive CONNECT_ESTABLISHED_ACK"<<endl;
@@ -122,10 +123,35 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
     }
 
     *channel << EVENT_WRITE ;
-    *channel << int2str(remoteOffset) ;
-    *channel << int2str(remoteSize) ;
-
     string msg;
+    *channel >> msg;
+    if (msg != ACK)
+    {
+        cerr<<"RDMAClient::write(), got unkonw msg: "<<msg<<endl;
+        return false;
+    }
+
+    *channel << int2str(remoteOffset);
+    *channel >> msg;
+    if (msg != ACK)
+    {
+        cerr<<"RDMAClient::write(), got unkonw msg: "<<msg<<endl;
+        return false;
+    }
+
+    *channel << int2str(remoteSize) ;
+    *channel >> msg;
+    if (msg != ACK)
+    {
+        cerr<<"RDMAClient::write(), got unkonw msg: "<<msg<<endl;
+        return false;
+    }
+
+    cout<<"RDMAClient::write(), send EVENT_WRITE ... \t"
+        << int2str(remoteOffset) <<"\t"
+        << int2str(remoteSize)  <<"\t"
+        << endl;
+
     *channel >> msg;
     if (msg == EVENT_WRITE_START)
     {

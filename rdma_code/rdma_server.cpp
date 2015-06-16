@@ -144,8 +144,16 @@ bool RDMAServer::dealEvent()
     else if (msg == EVENT_WRITE)
     {
         cout<<"RDMAServer::dealEvent(), got EVENT_WRITE"<<endl;
+        *channel << ACK;
+
         *channel >> offset_str;
+        cout<<"RDMAServer::dealEvent(), got offset_str "<<offset_str<<endl;
+        *channel << ACK;
+
         *channel >> memSize_str;
+        cout<<"RDMAServer::dealEvent(), got memSize_str "<<memSize_str<<endl;
+        *channel << ACK;
+
         offset = str2int(offset_str);
         size   = str2int(memSize_str);
 
