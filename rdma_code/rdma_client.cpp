@@ -127,7 +127,7 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
     *channel >> msg;
     if (msg != ACK)
     {
-        cerr<<"RDMAClient::write(), got unkonw msg: "<<msg<<endl;
+        cerr<<"RDMAClient::write()1, got unkonw msg: "<<msg<<endl;
         return false;
     }
 
@@ -135,17 +135,11 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
     *channel >> msg;
     if (msg != ACK)
     {
-        cerr<<"RDMAClient::write(), got unkonw msg: "<<msg<<endl;
+        cerr<<"RDMAClient::write()2, got unkonw msg: "<<msg<<endl;
         return false;
     }
 
     *channel << int2str(remoteSize) ;
-    *channel >> msg;
-    if (msg != ACK)
-    {
-        cerr<<"RDMAClient::write(), got unkonw msg: "<<msg<<endl;
-        return false;
-    }
 
     cout<<"RDMAClient::write(), send EVENT_WRITE ... \t"
         << int2str(remoteOffset) <<"\t"
@@ -167,7 +161,8 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
 
     for (int i = 0; i < remoteSize; i++)
     {
-        *channel << uchar2str( *mem ) ;
+        cout<<"send: "<< uchar2str( *mem ) << endl;
+        *channel << uchar2str( *mem );
         mem++;
     }
     

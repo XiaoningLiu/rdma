@@ -152,14 +152,13 @@ bool RDMAServer::dealEvent()
 
         *channel >> memSize_str;
         cout<<"RDMAServer::dealEvent(), got memSize_str "<<memSize_str<<endl;
-        *channel << ACK;
 
         offset = str2int(offset_str);
         size   = str2int(memSize_str);
 
         if (offset + memSize > size)
         {
-            cerr<<"RDMAServer::dealEvent(), Request size too large"<<endl;
+            cerr<<"RDMAServer::dealEvent(), Request size too large "<<offset<<" "<<memSize<<endl;
             *channel << EVENT_WRITE_FAIL_ACK ;
             return false;
         }
@@ -168,6 +167,7 @@ bool RDMAServer::dealEvent()
             *channel << EVENT_WRITE_START ;
         }
 
+        cout<<"RDMAServer::dealEvent(), start to receive write msg"<<endl;
         // Got memory data & save to memory
         uchar* mem = memory + offset;
         
