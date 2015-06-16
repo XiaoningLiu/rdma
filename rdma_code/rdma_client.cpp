@@ -74,15 +74,25 @@ bool RDMAClient::read(int localOffset, int remoteOffset, int remoteSize)
         return false;
     }
 
+    string msg;
     *channel << EVENT_READ ;
+    *channel >> msg;
+
     *channel << int2str(remoteOffset) ;
+    *channel >> msg;
+
     *channel << int2str(remoteSize) ;
 
-    string msg;
+    cout<<"RDMAClient::read(), send EVENT_READ "
+        <<int2str(remoteOffset) <<"\t"
+        <<int2str(remoteSize) <<"\t"
+        <<endl;
+
     *channel >> msg;
     if (msg == EVENT_READ_START)
     {
         cout<<"RDMAClient::read(), got EVENT_READ_START, ready to receive..."<<endl;
+        *channel << ACK;
     }
     else if (msg == EVENT_READ_FAIL_ACK)
     {
@@ -96,8 +106,11 @@ bool RDMAClient::read(int localOffset, int remoteOffset, int remoteSize)
     for (int i = 0; i < remoteSize; i++)
     {
         *channel >> data_str;
+        cout<<"got "<<data_str<<endl;
         *mem = str2uchar(data_str);
         mem++;
+
+        *channel << ACK;
     }
     
     *channel >> msg;

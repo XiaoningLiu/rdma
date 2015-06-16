@@ -112,11 +112,18 @@ bool RDMAServer::dealEvent()
 
     if (msg == EVENT_READ)
     {
+        *channel << ACK;
+
         cout<<"RDMAServer::dealEvent(), got EVENT_READ"<<endl;
         *channel >> offset_str;
+        *channel << ACK;
+        cout<<"offset_str: "<<offset_str<<endl;
+
         *channel >> memSize_str;
+        cout<<"memSize_str: "<<memSize_str<<endl;
+
         offset = str2int(offset_str);
-        size   = str2int(memSize_str);
+        memSize  = str2int(memSize_str);
 
         if (offset + memSize > size)
         {
@@ -129,13 +136,18 @@ bool RDMAServer::dealEvent()
             *channel << EVENT_READ_START ;
         }
 
+        *channel >> msg;
+
         uchar* mem = memory + offset;
         
         // transfer all memory data via char?
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < memSize; i++)
         {
+            cout<<"send "<<uchar2str( *mem ) <<endl;
             *channel << uchar2str( *mem ) ;
             mem++;
+
+            *channel >> msg;
         }
 
         *channel << EVENT_READ_ACK ;
