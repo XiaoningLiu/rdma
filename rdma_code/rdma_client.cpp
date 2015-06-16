@@ -206,7 +206,6 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
 RDMAClient::~RDMAClient()
 {
     delete channel;
-    delete memory;
 }
 
 bool RDMAClient::disconnect()

@@ -9,6 +9,8 @@
 typedef unsigned char uchar;
 typedef unsigned int  uint;
 
+enum EVENT_TYPE {ERROR, READ, WRITE, CLOSE};
+
 const std::string CONNECT_REQUEST = "CONNECT_REQUEST";
 const std::string CONNECT_REQUEST_ACK = "CONNECT_REQUEST_ACK";
 const std::string CONNECT_ESTABLISHED = "CONNECT_ESTABLISHED";

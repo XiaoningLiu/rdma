@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     }
     cout<<"Client connect success"<<endl;
 
-    const char *str1 = "renjunbujin safasdfasdf asdfasdf"; // 6 bytes
+    const char *str1 = "Hello Boy"; // 6 bytes
     strcpy((char*)mem, str1); // set mem[0] - > mem[5] to string "Hello"
     client.write(0, 0, strlen(str1) + 1); // write local memory mem[0]-mem[5] to remote memory [0]-[5]
 
@@ -56,6 +56,15 @@ int main(int argc, char** argv)
 
     cout<<"str1: "<<str1<<endl;
     cout<<"str2: "<<str2<<endl;
+
+    cout<<"client begin reading from remote twice"<<0<<" "<<strlen(str1) + 1<<endl;
+    client.read(0, 0, strlen(str1) + 1); // read remote memory [0]-[5] to local memory [6]-[12]
+
+    memPointer = mem;
+    char str3[strlen(str1) + 1];
+    strncpy(str3, (char*)memPointer, strlen(str1) + 1);
+
+    cout<<"str3: "<<str2<<endl;
 
     client.disconnect();
     cout<<"Client disconnect"<<endl;

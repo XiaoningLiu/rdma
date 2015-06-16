@@ -99,7 +99,7 @@ bool RDMAServer::acceptConnection()
     return true;
 }
 
-bool RDMAServer::dealEvent()
+EVENT_TYPE RDMAServer::dealEvent()
 {
     std::string msg;
     *channel >> msg;
@@ -129,7 +129,7 @@ bool RDMAServer::dealEvent()
         {
             cerr<<"RDMAServer::dealEvent(), Request size too large"<<endl;
             *channel << EVENT_READ_FAIL_ACK ;
-            return false;
+            return ERROR;
         }
         else
         {
@@ -151,7 +151,7 @@ bool RDMAServer::dealEvent()
         }
 
         *channel << EVENT_READ_ACK ;
-        return true;
+        return READ;
     }
     else if (msg == EVENT_WRITE)
     {
@@ -172,7 +172,7 @@ bool RDMAServer::dealEvent()
         {
             cerr<<"RDMAServer::dealEvent(), Request size too large "<<offset<<" "<<memSize<<endl;
             *channel << EVENT_WRITE_FAIL_ACK ;
-            return false;
+            return ERROR;
         }
         else
         {
@@ -200,18 +200,18 @@ bool RDMAServer::dealEvent()
 
         *channel << EVENT_WRITE_ACK ;
         cout<<"EVENT_WRITE_ACK"<<endl;
-        return true;
+        return WRITE;
     }
     else if (msg == DISCONNECT)
     {
         cout<<"RDMAServer::dealEvent(), got DISCONNECT"<<endl;
         disconnect();
-        return false;
+        return CLOSE;
     }
     else
     {
         cerr<<"Unkonw msg: "<<msg<<endl;
-        return false;
+        return ERROR;
     }
 }
 

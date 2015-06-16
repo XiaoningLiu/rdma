@@ -51,10 +51,28 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    while (server.dealEvent())
+    EVENT_TYPE event = server.dealEvent(); // write
+    cout<<"receive wirte"<<endl;
+    event = server.dealEvent(); // read
+    cout<<"receive read"<<endl;
+
+    char newStr[10] = "123456789";
+    strcpy((char*)mem + 10, newStr);
+    //memset(mem, 0, sizeof(uchar) * memSize);
+    cout<<"receive read, try to modify memory 10->19"<<endl;
+
+    event = server.dealEvent(); // read 
+
+    event = server.dealEvent(); // disconnect
+    cout<<"receive disconnect"<<endl;
+
+    /*
+    while (event != ERROR && event != CLOSE)
     {
+        event = server.dealEvent();
         continue;
     }
+    */
 
     free(mem);
     return 0;

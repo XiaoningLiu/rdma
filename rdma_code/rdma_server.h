@@ -19,7 +19,7 @@ public:
     bool createChannel(); // wait until receive "CONNECT_REQUEST"
     bool registerMemory(uchar* p, int size);
     bool acceptConnection(); // receive CONNECT_REQUEST, send ACK, receive CONNECT_ESTABLISHED, send ACK
-    bool dealEvent(); // judge evenet types & deal different msg
+    EVENT_TYPE dealEvent(); // judge evenet types & deal different msg
 
 private:
     bool disconnect(); //
