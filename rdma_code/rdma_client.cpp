@@ -164,6 +164,16 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
         cout<<"send: "<< uchar2str( *mem ) << endl;
         *channel << uchar2str( *mem );
         mem++;
+
+        if (i < remoteSize - 1)
+        {
+            *channel >> msg;
+            if (msg != ACK)
+            {
+                cerr<<"RDMAClient::write() for loop, got unkonw msg: "<<msg<<endl;
+                return false;
+            }
+        }
     }
     
     *channel >> msg;

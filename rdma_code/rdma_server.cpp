@@ -154,7 +154,7 @@ bool RDMAServer::dealEvent()
         cout<<"RDMAServer::dealEvent(), got memSize_str "<<memSize_str<<endl;
 
         offset = str2int(offset_str);
-        size   = str2int(memSize_str);
+        memSize = str2int(memSize_str);
 
         if (offset + memSize > size)
         {
@@ -176,7 +176,11 @@ bool RDMAServer::dealEvent()
         {
             *channel >> data_str;
             *mem = str2uchar(data_str);
+            cout<<"get "<< data_str<<endl;
             mem++;
+
+            if (i < size - 1)
+                *channel << ACK;
         }
 
         *channel << EVENT_WRITE_ACK ;
