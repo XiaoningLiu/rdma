@@ -172,18 +172,22 @@ bool RDMAServer::dealEvent()
         uchar* mem = memory + offset;
         
         std::string data_str;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < memSize; i++)
         {
             *channel >> data_str;
             *mem = str2uchar(data_str);
             cout<<"get "<< data_str<<endl;
             mem++;
 
-            if (i < size - 1)
+            if (i < memSize - 1)
+            {
                 *channel << ACK;
+                cout<<"ack"<<i<<endl;
+            }
         }
 
         *channel << EVENT_WRITE_ACK ;
+        cout<<"EVENT_WRITE_ACK"<<endl;
         return true;
     }
     else if (msg == DISCONNECT)

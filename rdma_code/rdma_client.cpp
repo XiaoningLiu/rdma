@@ -183,7 +183,7 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
     }
     else
     {
-        cerr<<"RDMAClient::write(), got unkonwn msg: "<<msg<< endl;
+        cerr<<"RDMAClient::write()5, got unkonwn msg: "<<msg<< endl;
         return false;
     }
    
