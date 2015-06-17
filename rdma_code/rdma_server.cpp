@@ -1,6 +1,7 @@
 /* filename: rdma_server.cpp */
 
 #include <iostream>
+#include <stdio.h>
 #include "rdma_server.h"
 
 using namespace::std;
@@ -143,7 +144,8 @@ EVENT_TYPE RDMAServer::dealEvent()
         // transfer all memory data via char?
         for (int i = 0; i < memSize; i++)
         {
-            cout<<"send "<<uchar2str( *mem ) <<endl;
+            cout<<"send "<<uchar2str( *mem );
+            printf("\t0x%.2x\n", uchar2uint( *mem )); 
             *channel << uchar2str( *mem ) ;
             mem++;
 
@@ -159,11 +161,11 @@ EVENT_TYPE RDMAServer::dealEvent()
         *channel << ACK;
 
         *channel >> offset_str;
-        cout<<"RDMAServer::dealEvent(), got offset_str "<<offset_str<<endl;
+        cout<<"offset_str "<<offset_str<<endl;
         *channel << ACK;
 
         *channel >> memSize_str;
-        cout<<"RDMAServer::dealEvent(), got memSize_str "<<memSize_str<<endl;
+        cout<<"memSize_str "<<memSize_str<<endl;
 
         offset = str2int(offset_str);
         memSize = str2int(memSize_str);
@@ -188,13 +190,13 @@ EVENT_TYPE RDMAServer::dealEvent()
         {
             *channel >> data_str;
             *mem = str2uchar(data_str);
-            cout<<"get "<< data_str<<endl;
+            cout<<"get "<< data_str;
+            printf("\t0x%.2x\n", uchar2uint( *mem )); 
             mem++;
 
             if (i < memSize - 1)
             {
                 *channel << ACK;
-                cout<<"ack"<<i<<endl;
             }
         }
 

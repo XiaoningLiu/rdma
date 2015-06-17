@@ -1,4 +1,5 @@
 #include "rdma_client.h"
+#include "stdio.h"
 using namespace std;
 
 RDMAClient::RDMAClient()
@@ -83,9 +84,10 @@ bool RDMAClient::read(int localOffset, int remoteOffset, int remoteSize)
 
     *channel << int2str(remoteSize) ;
 
-    cout<<"RDMAClient::read(), send EVENT_READ "
-        <<int2str(remoteOffset) <<"\t"
-        <<int2str(remoteSize) <<"\t"
+    cout<<"RDMAClient::read(), send EVENT_READ \n"
+        <<"localOffset:  " <<int2str(localOffset) <<endl
+        <<"remoteOffset: " <<int2str(remoteOffset) <<endl
+        <<"remoteSize:   " <<int2str(remoteSize)  <<"\t"
         <<endl;
 
     *channel >> msg;
@@ -106,8 +108,9 @@ bool RDMAClient::read(int localOffset, int remoteOffset, int remoteSize)
     for (int i = 0; i < remoteSize; i++)
     {
         *channel >> data_str;
-        cout<<"got "<<data_str<<endl;
+        cout<<"got "<<data_str;
         *mem = str2uchar(data_str);
+        printf("\t0x%.2x\n", uchar2uint( *mem )); 
         mem++;
 
         *channel << ACK;
@@ -116,7 +119,7 @@ bool RDMAClient::read(int localOffset, int remoteOffset, int remoteSize)
     *channel >> msg;
     if (msg == EVENT_READ_ACK)
     {
-        cout<<"RDMAClient::read(), got EVENT_READ_ACK"<<endl;
+        cout<<"RDMAClient::read(), got EVENT_READ_ACK, finished"<<endl;
     }
     else
     {
@@ -154,9 +157,10 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
 
     *channel << int2str(remoteSize) ;
 
-    cout<<"RDMAClient::write(), send EVENT_WRITE ... \t"
-        << int2str(remoteOffset) <<"\t"
-        << int2str(remoteSize)  <<"\t"
+    cout<<"RDMAClient::write(), send EVENT_WRITE ... "<<endl
+        <<"localOffset:  " <<int2str(localOffset) <<endl
+        <<"remoteOffset: " <<int2str(remoteOffset) <<endl
+        <<"remoteSize:   " <<int2str(remoteSize)  <<"\t"
         << endl;
 
     *channel >> msg;
@@ -174,7 +178,8 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
 
     for (int i = 0; i < remoteSize; i++)
     {
-        cout<<"send: "<< uchar2str( *mem ) << endl;
+        cout<<"send: "<< uchar2str( *mem );
+        printf("\t0x%.2x\n", uchar2uint( *mem )); 
         *channel << uchar2str( *mem );
         mem++;
 
@@ -192,7 +197,7 @@ bool RDMAClient::write(int localOffset, int remoteOffset, int remoteSize)
     *channel >> msg;
     if (msg == EVENT_WRITE_ACK)
     {
-        cout<<"RDMAClient::write(), got EVENT_WRITE_ACK"<<endl;
+        cout<<"RDMAClient::write(), got EVENT_WRITE_ACK, finished"<<endl;
     }
     else
     {
