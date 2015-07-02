@@ -10,6 +10,8 @@
 #include "SocketException.h"
 #include "rdma_common.h"
 #include <string>
+#include <queue>
+#include <pthread.h>
 
 class RDMAClient
 {
@@ -22,7 +24,16 @@ public:
     bool read(int localOffset, int remoteOffset, int remoteSize);
     bool write(int localOffset, int remoteOffset, int remoteSize);
     bool disconnect();
+
+    void* thr_fn(void *arg);
 private:
+   std::queue<Event> requests;
+   std::queue<Event> completes;
+   int event_id;
+   pthread_t ntid;
+   pthread_mutex_t mutex;
+   bool thr_fin;
+
    ClientSocket *channel;
    uchar* memory;
    int    size;

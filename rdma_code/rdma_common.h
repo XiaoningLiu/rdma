@@ -34,4 +34,12 @@ uchar str2uchar(std::string str);
 int str2int(std::string str);
 std::string int2str(int i);
 
+struct Event
+{
+  std::string type;
+  int localOffset;
+  int remoteOffset;
+  int size;
+};
+
 #endif//RDMA_COMMON_H

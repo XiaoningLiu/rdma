@@ -7,6 +7,51 @@ RDMAClient::RDMAClient()
     channel = 0;
     memory  = 0;
     size    = 0;
+
+    thr_fin = false;
+
+    int err;
+    pthread_mutex_init(&mutex, NULL);
+    err = pthread_create(&ntid, NULL, thr_fn, NULL);
+    if (err != 0)
+    {
+        cerr<<"Cannot create thread"<<endl;
+        return false;
+    }
+}
+
+void* RDMAClient::thr_fn(void* arg)
+{
+  pthread_mutex_lock(&mutex);
+
+  while(thr_fin == false)
+  {
+    // there are some requests  todo
+    requests.size() > 0;
+    Event et = requests.pop();
+
+    // do the request
+    if (et.type == EVENT_READ)
+    {
+      read(et.localOffset, et.remoteOffset, et.size);
+    }
+    else if (et.type == EVENT_WRITE)
+    {
+      write(et.localOffset, et.remoteOffset, et.size);
+    }
+    else
+    {
+        cerr<<"Unknow event in queue"<<endl;
+        break;
+    }
+
+    // move it to completes queue
+    completes.push(et);
+    sleep(1);
+  }
+
+  pthread_mutex_unlock(&mutex);
+  return ((void*)0);
 }
 
 bool RDMAClient::createChannel(string serverIp, int port)
